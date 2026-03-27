@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgênciaOS — Le Essence</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #0e0f11; color: #f0f1f3; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.box { background: #16181c; border: 1px solid rgba(255,255,255,0.13); border-radius: 20px; padding: 40px; width: 100%; max-width: 400px; text-align: center; }
+.logo { width: 52px; height: 52px; background: #6c63ff; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; margin: 0 auto 20px; }
+h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+p { font-size: 14px; color: #8b8fa8; margin-bottom: 28px; }
+input { width: 100%; background: #1e2128; border: 1px solid rgba(255,255,255,0.13); border-radius: 10px; padding: 12px 14px; color: #f0f1f3; font-size: 14px; outline: none; margin-bottom: 12px; font-family: inherit; }
+input:focus { border-color: #6c63ff; }
+button { width: 100%; padding: 13px; border-radius: 10px; background: #6c63ff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; margin-top: 4px; }
+button:hover { background: #7c73ff; }
+.error { color: #f87171; font-size: 13px; margin-top: 10px; display: none; padding: 10px; background: rgba(239,68,68,0.1); border-radius: 8px; }
+.loading { display: none; color: #8b8fa8; font-size: 13px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">L</div>
+  <h1>Le Essence</h1>
+  <p>Entre com seu e-mail e senha</p>
+  <input type="email" id="email" placeholder="seu@email.com" autofocus>
+  <input type="password" id="senha" placeholder="Senha" onkeydown="if(event.key==='Enter')entrar()">
+  <button onclick="entrar()">Entrar</button>
+  <div class="error" id="erro"></div>
+  <div class="loading" id="loading">Verificando...</div>
+</div>
+
+<script>
+const SB_URL = 'https://nblokxxsjanjajkgvhyg.supabase.co';
+const SB_KEY = 'sb_publishable_YQv28_1mgjKskFZ_moWByg_-CY7_nK3';
+const AGENCY_ID = 'leessence';
+
+async function entrar() {
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const erro = document.getElementById('erro');
+  const loading = document.getElementById('loading');
+  
+  erro.style.display = 'none';
+  
+  if (!email || !senha) {
+    erro.textContent = 'Preencha e-mail e senha';
+    erro.style.display = 'block';
+    return;
+  }
+  
+  loading.style.display = 'block';
+  document.querySelector('button').disabled = true;
+  
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/members?email=eq.${encodeURIComponent(email)}&agency_id=eq.${AGENCY_ID}`, {
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const members = await r.json();
+    
+    if (!members || members.length === 0) {
+      throw new Error('E-mail não encontrado. Fale com o administrador.');
+    }
+    
+    const m = members[0];
+    const senhaHash = btoa(senha);
+    
+    if (m.senha && m.senha !== senhaHash) {
+      throw new Error('Senha incorreta.');
+    }
+    
+    if (!m.senha) {
+      // First login - save password
+      await fetch(`${SB_URL}/rest/v1/members?id=eq.${m.id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({ senha: senhaHash })
+      });
+    }
+    
+    // Save session and redirect
+    localStorage.setItem('le_user', JSON.stringify(m));
+    window.location.href = 'index.html';
+    
+  } catch(e) {
+    loading.style.display = 'none';
+    document.querySelector('button').disabled = false;
+    erro.textContent = e.message || 'Erro ao conectar. Tente novamente.';
+    erro.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
