@@ -2758,8 +2758,8 @@ async function callClaude(prompt){
       var txt=data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]?data.candidates[0].content.parts[0].text:null;
       return txt||null;
     }
-    // OpenAI (sk-...)
-    if(key.startsWith('sk-')){
+    // OpenAI (sk-proj... mas NÃO sk-ant que é Claude)
+    if(key.startsWith('sk-') && !key.startsWith('sk-ant')){
       var res = await fetch('https://api.openai.com/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -4836,7 +4836,7 @@ function saveApiKey(){
   localStorage.setItem('le_claude_key', key);
   window._savedClaudeKey = key;
   window.CLAUDE_API_KEY_ACTIVE = key;
-  var provider = key.startsWith('AIza')?'Gemini 🟢 (grátis)':key.startsWith('sk-')?'OpenAI':'Claude';
+  var provider = key.startsWith('AIza')?'Gemini 🟢 (grátis)':key.startsWith('sk-ant')?'Claude':key.startsWith('sk-proj')?'OpenAI':key.startsWith('sk-')?'OpenAI':'Claude';
   var status = document.getElementById('api-key-status');
   if(status) status.textContent = '✅ '+provider+' configurada!';
   toast('✅ '+provider+' salva e ativa!','ok');
