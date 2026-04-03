@@ -2740,9 +2740,10 @@ async function callClaude(prompt){
   var key = localStorage.getItem('le_claude_key') || window._savedClaudeKey || window.CLAUDE_API_KEY_ACTIVE || CLAUDE_API_KEY;
   key = (key||'').trim();
   if(!key || key === 'COLE_SUA_CLAUDE_API_KEY_AQUI' || key.length < 10){
-    toast('Configure a API Key em Configurações → 🤖 IA','er');
+    toast('❌ API Key não encontrada. Vá em Configurações → 🤖 IA e salve sua chave','er');
     return null;
   }
+  console.log('callClaude: usando provider='+( key.startsWith('AIza')?'Gemini':key.startsWith('sk-ant')?'Claude':'OpenAI')+', key='+key.slice(0,8)+'...');
   // Auto-detect and save active key
   window.CLAUDE_API_KEY_ACTIVE = key;
   try{
