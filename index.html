@@ -1416,6 +1416,7 @@ function setSynced() { document.getElementById('sync-dot').className='sync-dot';
     <div class="nav-item" onclick="nav('clientes')" data-page="clientes"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 7h14" stroke="currentColor" stroke-width="1.5"/></svg>Carteira<span class="nav-badge" id="badge-cli">0</span></div>
     <div class="nav-item" onclick="nav('onboarding')"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Onboarding</div>
     <div class="nav-sec">Conteúdo</div>
+    <div class="nav-item" onclick="nav('briefings')" data-page="briefings"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="1.5" width="12" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Briefings</div>
     <div class="nav-item" onclick="nav('posts-dia')" data-page="posts-dia"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Posts do Dia<span class="nav-badge" id="badge-posts-dia" style="background:var(--red);display:none">!</span></div>
     <div class="nav-item" onclick="nav('datas-com')" data-page="datas-com"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v3M11 1v3M1 7h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="5" cy="11" r="1.5" fill="currentColor"/><circle cx="11" cy="11" r="1.5" fill="currentColor"/></svg>Datas Comemorativas<span class="nav-badge" id="badge-datas" style="background:var(--accent);display:none">!</span></div>
     <div class="nav-item" onclick="nav('trends-page')" data-page="trends-page"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-4 3 2 3-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Trends</div>
@@ -1771,6 +1772,15 @@ function setSynced() { document.getElementById('sync-dot').className='sync-dot';
 
 
     <!-- POSTS DO DIA -->
+    <div id="page-briefings" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div style="font-size:20px;font-weight:800">📋 Briefings</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px">Estratégia, identidade visual e contexto de cada cliente</div>
+        </div>
+      </div>
+      <div id="briefings-client-list"></div>
+    </div>
     <div id="page-posts-dia" class="page">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div>
@@ -2666,6 +2676,8 @@ function nav(page){
   }
   // Close sidebar on mobile when navigating
   if(window.innerWidth <= 768) closeSidebar();
+  // Render page on navigation
+  if(page==='briefings') setTimeout(renderBriefingsPage, 50);
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pageEl=document.getElementById('page-'+page);
@@ -3104,6 +3116,66 @@ function switchBriefTab(btn){
   var sec = document.getElementById(secId);
   if(sec) sec.style.display='block';
 }
+
+
+// ================================================================
+// PÁGINA BRIEFINGS (sidebar)
+// ================================================================
+async function renderBriefingsPage(){
+  var el = document.getElementById('briefings-client-list');
+  if(!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Carregando...</div>';
+  try {
+    var clients = await dbGet('clients');
+    if(!clients.length){
+      el.innerHTML = '<div class="empty"><h3>Nenhum cliente cadastrado</h3></div>';
+      return;
+    }
+    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">';
+    clients.forEach(function(c){
+      var b = c.briefing || {};
+      var cores = b.cores || [];
+      var coresHtml = '';
+      cores.slice(0,5).forEach(function(cor){
+        coresHtml += '<div style="width:16px;height:16px;border-radius:3px;background:'+cor+';border:1px solid rgba(255,255,255,0.15);display:inline-block;margin-right:3px"></div>';
+      });
+      var hasData = !!(b.estrategia || b.prompt_ia || b.fontes || (b.pdfs && b.pdfs.length) || (b.prompts && b.prompts.length));
+      var statusStyle = hasData ? 'background:rgba(74,222,128,0.1);color:#4ade80' : 'background:var(--bg3);color:var(--text3)';
+      var initials = (c.nome||'?').slice(0,2).toUpperCase();
+      html += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:border .15s"'
+            + ' data-cid="'+c.id+'" onclick="openClientBriefingById(this.dataset.cid)">'
+            + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
+            + '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">'+initials+'</div>'
+            + '<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">'+c.nome+'</div>'
+            + '<div style="font-size:11px;color:var(--text3)">'+(c.seg||'Sem segmento')+'</div></div>'
+            + '<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;'+statusStyle+'">'+(hasData?'✓ Preenchido':'Vazio')+'</span>'
+            + '</div>'
+            + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">'
+            + (b.tom ? '<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:var(--bg3);color:var(--text2)">🎙 '+b.tom.slice(0,18)+'</span>' : '')
+            + ((b.prompts&&b.prompts.length) ? '<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(139,92,246,0.1);color:#a78bfa">🤖 '+b.prompts.length+' prompt'+(b.prompts.length>1?'s':'')+'</span>' : '')
+            + ((b.pdfs&&b.pdfs.length) ? '<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(59,130,246,0.1);color:#60a5fa">📄 '+b.pdfs.length+' PDF</span>' : '')
+            + '</div>'
+            + (coresHtml ? '<div style="display:flex;align-items:center;gap:2px;margin-bottom:12px"><span style="font-size:10px;color:var(--text3);margin-right:4px">Cores:</span>'+coresHtml+'</div>' : '')
+            + '<button class="btn btn-primary btn-sm" style="width:100%" onclick="event.stopPropagation();openClientBriefingById(this.parentNode.dataset.cid)">✏️ Editar Briefing</button>'
+            + '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><p>Erro ao carregar</p></div>';
+    console.error(e);
+  }
+}
+
+async function openClientBriefingById(clientId){
+  await openClientDetail(clientId);
+  setTimeout(function(){
+    document.querySelectorAll('.ti').forEach(function(t){
+      if(t.getAttribute('onclick') && t.getAttribute('onclick').indexOf('cd-briefing') !== -1) t.click();
+    });
+  }, 500);
+}
+// ================================================================
 
 async function saveBriefing(clientId){
   function gv(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
