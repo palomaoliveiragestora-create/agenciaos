@@ -2996,7 +2996,7 @@ function renderBriefingTab(c){
   // Prompts list
   var promptsHtml = '';
   if(!prompts.length){
-    promptsHtml = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;border:1px dashed var(--border2);border-radius:10px">Nenhum prompt ainda. Clique em <strong style="color:var(--accent)">+ Novo</strong> para criar.</div>';
+    promptsHtml = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Nenhum prompt criado ainda.<br>Clique em <strong style="color:var(--accent)">+ Novo Prompt</strong> acima.</div>';
   } else {
     var CATCOL = {Educativo:'#60a5fa',Promocional:'#f59e0b',Engajamento:'#4ade80',Bastidores:'#a78bfa',Institucional:'#14b8a6',Sazonal:'#f472b6',Outro:'#94a3b8'};
     promptsHtml = prompts.map(function(p, i){
@@ -3059,12 +3059,10 @@ function renderBriefingTab(c){
 
     // Sec 2: Prompts (biblioteca completa)
     +'<div id="brief-sec-2" class="brief-sec" style="display:none;padding-top:16px">'
-    +'<div style="margin-bottom:14px">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px">'
-    +'<div style="font-size:13px;font-weight:700">🤖 Biblioteca de Prompts</div>'
-    +'<button type="button" id="bf-new-p" class="btn btn-primary btn-sm">+ Novo Prompt</button>'
-    +'</div>'
-    +'<div style="font-size:11px;color:var(--text3)">Crie prompts específicos — selecione na Linha Editorial</div>'
+    +'<div style="margin-bottom:16px">'
+    +'<div style="font-size:14px;font-weight:700;margin-bottom:4px">🤖 Biblioteca de Prompts</div>'
+    +'<div style="font-size:11px;color:var(--text3);margin-bottom:12px">Crie prompts específicos — selecione na Linha Editorial</div>'
+    +'<button type="button" id="bf-new-p" class="btn btn-primary" style="width:100%">+ Novo Prompt</button>'
     +'</div>'
     +'<div id="bf-prompts-list">'+promptsHtml+'</div>'
     +'</div>'
