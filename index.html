@@ -3014,13 +3014,7 @@ function renderBriefingTab(c){
     }).join('');
   }
 
-  // PDFs
-  var pdfsHtml = pdfs.map(function(p){
-    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:8px;margin-bottom:6px;font-size:12px">'
-      +'<span>📄 '+p.name+'</span>'
-      +'<button type="button" data-pname="'+p.name.replace(/"/g,'&quot;')+'" class="bf-del-pdf" style="margin-left:auto;background:none;border:none;color:var(--red);cursor:pointer;font-size:16px">×</button>'
-      +'</div>';
-  }).join('');
+
 
   // Campanhas
   var campsHtml = !campanhas.length
@@ -3065,10 +3059,12 @@ function renderBriefingTab(c){
 
     // Sec 2: Prompts (biblioteca completa)
     +'<div id="brief-sec-2" class="brief-sec" style="display:none;padding-top:16px">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
-    +'<div><div style="font-size:13px;font-weight:700">🤖 Biblioteca de Prompts</div>'
-    +'<div style="font-size:11px;color:var(--text3);margin-top:2px">Crie prompts específicos por tipo de conteúdo — use na Linha Editorial</div></div>'
+    +'<div style="margin-bottom:14px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:4px">'
+    +'<div style="font-size:13px;font-weight:700">🤖 Biblioteca de Prompts</div>'
     +'<button type="button" id="bf-new-p" class="btn btn-primary btn-sm">+ Novo Prompt</button>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--text3)">Crie prompts específicos — selecione na Linha Editorial</div>'
     +'</div>'
     +'<div id="bf-prompts-list">'+promptsHtml+'</div>'
     +'</div>'
@@ -3078,18 +3074,14 @@ function renderBriefingTab(c){
     +'<div class="fg"><label class="fl">Links de Google Drive / Docs</label>'
     +'<textarea class="fta" id="bf-drive-links" rows="4" placeholder="Cole os links do Drive&#10;Um por linha">'+(b.drive_links||'')+'</textarea>'
     +'<div style="font-size:11px;color:var(--text3);margin-top:4px">Use o conteúdo dos docs como base no Prompt IA</div></div>'
-    +'<div class="fg"><label class="fl">PDF / Documentos (até 3)</label>'
-    +'<div id="bf-pdf-list">'+pdfsHtml+'</div>'
-    +'<label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border:1px dashed var(--border2);border-radius:10px;cursor:pointer;font-size:12px;color:var(--text2);margin-top:6px">'
-    +'<span>📎 Clique para anexar PDF</span>'
-    +'<input type="file" accept=".pdf" id="bf-pdf-input" style="display:none"></label></div>'
+
     +'<div class="fg"><label class="fl">Notas internas</label>'
     +'<textarea class="fta" id="bf-notas-docs" rows="2" placeholder="Observações sobre documentos...">'+(b.notas_docs||'')+'</textarea></div>'
     +'</div>'
 
     // Sec 4: Campanhas
     +'<div id="brief-sec-4" class="brief-sec" style="display:none;padding-top:16px">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">'
     +'<div style="font-size:13px;font-weight:600">Histórico de campanhas</div>'
     +'<button type="button" id="bf-new-camp" class="btn btn-primary btn-sm">+ Campanha</button></div>'
     +'<div id="bf-camp-list">'+campsHtml+'</div>'
@@ -3141,14 +3133,7 @@ function renderBriefingTab(c){
     inp.addEventListener('change', function(){ briefingUpdateCor(cid, parseInt(this.dataset.idx), this.value); });
   });
 
-  // PDF input
-  var pdfEl = document.getElementById('bf-pdf-input');
-  if(pdfEl) pdfEl.addEventListener('change', function(){ briefingUploadPDF(cid, this); });
 
-  // Delete PDF
-  root.querySelectorAll('.bf-del-pdf').forEach(function(btn){
-    btn.addEventListener('click', function(){ briefingRemovePDF(cid, this.dataset.pname); });
-  });
 }
 
 // ── Prompt modal (criar/editar) ─────────────────────────────────
