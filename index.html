@@ -173,8 +173,8 @@ tbody tr:hover .ra{opacity:1}
 
 .cd-hdr{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .cd-av{width:52px;height:52px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
-.tabs-line{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
-.ti{padding:10px 16px;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .13s;font-weight:500;white-space:nowrap}
+.tabs-line{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch}
+.ti{padding:10px 16px;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .13s;font-weight:500;white-space:nowrap;flex-shrink:0}
 .ti.active{color:var(--text);border-bottom-color:var(--accent)}
 .tp{display:none}.tp.active{display:block}
 
@@ -864,13 +864,24 @@ async function gerarCalendarioIA(clientId){
   var briefingCtx = '';
   if(usarBriefing && client.briefing){
     var b = client.briefing;
-    if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
-    if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
-    if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
-    if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
-    if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
-    if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
-    if(b.prompt_ia) briefingCtx += '\n\nInstruções específicas: '+b.prompt_ia;
+    var promptIdx = document.getElementById('le-prompt-id') ? document.getElementById('le-prompt-id').value : '';
+    var prompts = b.prompts||[];
+    // If a specific prompt is selected, use it
+    if(promptIdx !== '' && prompts[parseInt(promptIdx)]){
+      var selectedPrompt = prompts[parseInt(promptIdx)];
+      briefingCtx += '\n\n=== PROMPT PERSONALIZADO: '+selectedPrompt.nome+' ===\n'+selectedPrompt.texto;
+      // Also add base context
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    } else {
+      // Use general briefing context
+      if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
+      if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
+      if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    }
   }
   var modal=document.getElementById('modal-cal-ia');
   if(!modal){modal=document.createElement('div');modal.id='modal-cal-ia';modal.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;align-items:center;justify-content:center;padding:20px';document.body.appendChild(modal);}
@@ -968,13 +979,24 @@ async function gerarRelatorioPDF(clientId){
   var briefingCtx = '';
   if(usarBriefing && client.briefing){
     var b = client.briefing;
-    if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
-    if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
-    if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
-    if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
-    if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
-    if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
-    if(b.prompt_ia) briefingCtx += '\n\nInstruções específicas: '+b.prompt_ia;
+    var promptIdx = document.getElementById('le-prompt-id') ? document.getElementById('le-prompt-id').value : '';
+    var prompts = b.prompts||[];
+    // If a specific prompt is selected, use it
+    if(promptIdx !== '' && prompts[parseInt(promptIdx)]){
+      var selectedPrompt = prompts[parseInt(promptIdx)];
+      briefingCtx += '\n\n=== PROMPT PERSONALIZADO: '+selectedPrompt.nome+' ===\n'+selectedPrompt.texto;
+      // Also add base context
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    } else {
+      // Use general briefing context
+      if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
+      if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
+      if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    }
   }
   var posts=await dbGet('posts');
   var cPosts=posts.filter(function(p){return p.client_id===clientId;});
@@ -1047,13 +1069,24 @@ async function gerarEstrategiaIA(clientId){
   var briefingCtx = '';
   if(usarBriefing && client.briefing){
     var b = client.briefing;
-    if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
-    if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
-    if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
-    if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
-    if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
-    if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
-    if(b.prompt_ia) briefingCtx += '\n\nInstruções específicas: '+b.prompt_ia;
+    var promptIdx = document.getElementById('le-prompt-id') ? document.getElementById('le-prompt-id').value : '';
+    var prompts = b.prompts||[];
+    // If a specific prompt is selected, use it
+    if(promptIdx !== '' && prompts[parseInt(promptIdx)]){
+      var selectedPrompt = prompts[parseInt(promptIdx)];
+      briefingCtx += '\n\n=== PROMPT PERSONALIZADO: '+selectedPrompt.nome+' ===\n'+selectedPrompt.texto;
+      // Also add base context
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    } else {
+      // Use general briefing context
+      if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
+      if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
+      if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    }
   }
   var seg=client.seg||'Geral';
   var data=ESTRATEGIA_IG[seg]||ESTRATEGIA_IG['Geral'];
@@ -1416,6 +1449,7 @@ function setSynced() { document.getElementById('sync-dot').className='sync-dot';
     <div class="nav-item" onclick="nav('clientes')" data-page="clientes"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 7h14" stroke="currentColor" stroke-width="1.5"/></svg>Carteira<span class="nav-badge" id="badge-cli">0</span></div>
     <div class="nav-item" onclick="nav('onboarding')"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Onboarding</div>
     <div class="nav-sec">Conteúdo</div>
+    <div class="nav-item" onclick="nav('briefings')" data-page="briefings"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="1.5" width="12" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Briefings</div>
     <div class="nav-item" onclick="nav('posts-dia')" data-page="posts-dia"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Posts do Dia<span class="nav-badge" id="badge-posts-dia" style="background:var(--red);display:none">!</span></div>
     <div class="nav-item" onclick="nav('datas-com')" data-page="datas-com"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 1v3M11 1v3M1 7h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="5" cy="11" r="1.5" fill="currentColor"/><circle cx="11" cy="11" r="1.5" fill="currentColor"/></svg>Datas Comemorativas<span class="nav-badge" id="badge-datas" style="background:var(--accent);display:none">!</span></div>
     <div class="nav-item" onclick="nav('trends-page')" data-page="trends-page"><svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l3-4 3 2 3-5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Trends</div>
@@ -1576,10 +1610,10 @@ function setSynced() { document.getElementById('sync-dot').className='sync-dot';
       <div class="cd-hdr" id="cd-hdr"></div>
       <div class="tabs-line">
         <div class="ti active" onclick="switchTab('cd-geral',this)">Geral</div>
-        <div class="ti" onclick="switchTab('cd-cadastro',this)" style="color:var(--accent)">📝 Cadastro</div>
+        <div class="ti" onclick="switchTab('cd-cadastro',this)">📝 Cadastro</div>
         <div class="ti" onclick="switchTab('cd-processo',this)">Processo</div>
         <div class="ti" onclick="switchTab('cd-conteudo',this)">Conteúdo</div>
-        <div class="ti" onclick="switchTab('cd-ia',this)">IA</div>
+        <div class="ti" onclick="switchTab('cd-ia',this)">✦ IA</div>
         <div class="ti" onclick="switchTab('cd-aprovacao',this)">Aprovação</div>
         <div class="ti" onclick="switchTab('cd-metricas',this)">Métricas</div>
         <div class="ti" onclick="switchTab('cd-historico',this)">Histórico</div>
@@ -1587,8 +1621,6 @@ function setSynced() { document.getElementById('sync-dot').className='sync-dot';
         <div class="ti" onclick="switchTab('cd-saude',this)">💯 Saúde</div>
         <div class="ti" onclick="switchTab('cd-timeline',this)">📅 Timeline</div>
         <div class="ti" onclick="switchTab('cd-checklist',this)">✓ Checklist</div>
-        <div class="ti" onclick="switchTab('cd-cadastro',this)">📝 Cadastro</div>
-        <div class="ti" onclick="switchTab('cd-ia',this)">✦ IA</div>
         <div class="ti" onclick="switchTab('cd-estrategia',this)">Estratégia</div>
         <div class="ti" onclick="switchTab('cd-briefing',this)">📋 Briefing</div>
         <div class="ti" onclick="switchTab('cd-financeiro',this)">Financeiro</div>
@@ -1608,7 +1640,6 @@ function setSynced() { document.getElementById('sync-dot').className='sync-dot';
       <div id="cd-estrategia" class="tp"></div>
       <div id="cd-briefing" class="tp"></div>
       <div id="cd-financeiro" class="tp"></div>
-      <div id="cd-cadastro" class="tp"></div>
     </div>
 
     <!-- ONBOARDING -->
@@ -1771,6 +1802,15 @@ function setSynced() { document.getElementById('sync-dot').className='sync-dot';
 
 
     <!-- POSTS DO DIA -->
+    <div id="page-briefings" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+        <div>
+          <div style="font-size:20px;font-weight:800">📋 Briefings</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px">Estratégia, identidade visual e contexto de cada cliente</div>
+        </div>
+      </div>
+      <div id="briefings-client-list"></div>
+    </div>
     <div id="page-posts-dia" class="page">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div>
@@ -2666,6 +2706,8 @@ function nav(page){
   }
   // Close sidebar on mobile when navigating
   if(window.innerWidth <= 768) closeSidebar();
+  // Render page content on navigation
+  if(page==='briefings') setTimeout(renderBriefingsPage, 50);
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pageEl=document.getElementById('page-'+page);
@@ -2925,7 +2967,12 @@ async function buildClientTabs(c){
   const ll={ideia:'Ideia',producao:'Produção',revisao:'Revisão',aguardando:'Aguardando',aprovado:'Aprovado',publicado:'Publicado'};
   document.getElementById('cd-conteudo').innerHTML=`<div class="sh"><div class="st">Posts${c.trello_board_id?` <span class="badge b-trello">Trello</span>`:''}</div><button class="btn btn-primary btn-sm" onclick="openPostForClient('${c.id}')">+ Post</button></div><div class="tw"><table><thead><tr><th>Data</th><th>Título</th><th>Formato</th><th>Etapa</th></tr></thead><tbody>${posts.length?posts.map(p=>`<tr><td>${p.data||'—'}</td><td>${p.titulo}${p.trello_card_id?` <span class="badge b-trello" style="font-size:9px">Trello</span>`:''}</td><td><span class="badge b-b">${p.formato}</span></td><td><span class="badge ${sl[p.stage]||'b-gr'}">${ll[p.stage]||p.stage}</span></td></tr>`).join(''):`<tr><td colspan="4"><div class="empty"><p>Nenhum post</p></div></td></tr>`}</tbody></table></div>`;
 
-  document.getElementById('cd-ia').innerHTML=`<div class="ai-panel"><div class="ai-panel-title">IA — Geração de legendas</div><div class="fg"><label class="fl">Tema</label><input class="fi" id="ai-tema" placeholder="Ex: promoção de verão..."></div><div class="fg"><label class="fl">Tom de voz</label><input class="fi" id="ai-tom" value="${c.tom||''}" placeholder="profissional, descontraído..."></div><div style="display:flex;gap:8px;margin-top:4px"><button class="btn btn-ai btn-sm" onclick="gerarLegenda('${c.nome}')">✦ Gerar legenda</button><button class="btn btn-ai btn-sm" onclick="gerarHashtags('${c.nome}','${c.seg||''}')">✦ Hashtags</button></div><div class="ai-loading" id="ai-loading">✦ Gerando...</div><div class="ai-result" id="ai-result"></div></div>`;
+  var iaPrompts = (c.briefing&&c.briefing.prompts)||[];
+  var iaPromptOpts = '<option value="">— Sem prompt específico —</option>'
+    + iaPrompts.map(function(p,i){ return '<option value="'+i+'">'+p.nome+' ('+p.categoria+' · '+p.formato+')</option>'; }).join('');
+  document.getElementById('cd-ia').innerHTML=`<div class="ai-panel"><div class="ai-panel-title">IA — Geração de legendas</div>`
+    + (iaPrompts.length ? `<div class="fg"><label class="fl">Usar prompt da biblioteca</label><select class="fs" id="ai-prompt-sel" onchange="iaApplyPrompt('${c.id}',this.value)">${iaPromptOpts}</select></div>` : '')
+    + `<div class="fg"><label class="fl">Tema</label><input class="fi" id="ai-tema" placeholder="Ex: promoção de verão..."></div><div class="fg"><label class="fl">Tom de voz</label><input class="fi" id="ai-tom" value="${c.tom||''}" placeholder="profissional, descontraído..."></div><div style="display:flex;gap:8px;margin-top:4px"><button class="btn btn-ai btn-sm" onclick="gerarLegenda('${c.nome}')">✦ Gerar legenda</button><button class="btn btn-ai btn-sm" onclick="gerarHashtags('${c.nome}','${c.seg||''}')">✦ Hashtags</button></div><div class="ai-loading" id="ai-loading">✦ Gerando...</div><div class="ai-result" id="ai-result"></div></div>`;
 
   const pendP=posts.filter(p=>p.stage==='aguardando');
   const apLink=genApLink(c.id);
@@ -2952,6 +2999,80 @@ async function saveMetrics(id){await dbUpdate('clients',id,{metrics:{seguidores:
 async function addHist(id){const input=document.getElementById('hist-in');if(!input){toast('Erro ao localizar campo','er');return;}const text=input.value.trim();if(!text)return;try{const r=await fetch(`${SB_URL}/rest/v1/clients?id=eq.${id}`,{headers:SB.headers});const data=await r.json();const c=Array.isArray(data)?data[0]:data;const hist=c?.historico||[];hist.unshift({text,date:new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})});await dbUpdate('clients',id,{historico:hist});input.value='';openClientDetail(id);toast('Registrado!','ok');}catch(e){toast('Erro ao registrar','er');console.error(e);}}
 
 // ================================================================
+
+// ================================================================
+// PÁGINA BRIEFINGS (sidebar)
+// ================================================================
+async function renderBriefingsPage(){
+  var el = document.getElementById('briefings-client-list');
+  if(!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Carregando...</div>';
+  try {
+    var clients = await dbGet('clients');
+    if(!clients.length){
+      el.innerHTML = '<div class="empty"><h3>Nenhum cliente cadastrado</h3></div>';
+      return;
+    }
+    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">';
+    clients.forEach(function(c){
+      var b = c.briefing || {};
+      var cores = b.cores || [];
+      var coresHtml = '';
+      cores.slice(0,5).forEach(function(cor){
+        coresHtml += '<div style="width:16px;height:16px;border-radius:3px;background:'+cor+';border:1px solid rgba(255,255,255,0.15);display:inline-block;margin-right:3px"></div>';
+      });
+      var hasData = !!(b.estrategia || b.prompt_ia || b.fontes || (b.pdfs && b.pdfs.length));
+      var statusStyle = hasData
+        ? 'background:rgba(74,222,128,0.1);color:#4ade80'
+        : 'background:var(--bg3);color:var(--text3)';
+      var statusTxt = hasData ? '✓ Preenchido' : 'Vazio';
+      var initials = (c.nome||'?').slice(0,2).toUpperCase();
+      var seg = c.seg || 'Sem segmento';
+
+      html += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;cursor:pointer;transition:border .15s"'
+            + ' onclick="openClientBriefing(this)" data-id="'+c.id+'">'
+            + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
+            + '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">'+initials+'</div>'
+            + '<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">'+c.nome+'</div>'
+            + '<div style="font-size:11px;color:var(--text3)">'+seg+'</div></div>'
+            + '<span style="font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;'+statusStyle+'">'+statusTxt+'</span>'
+            + '</div>'
+            + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">'
+            + (b.tom ? '<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:var(--bg3);color:var(--text2)">🎙 '+b.tom.slice(0,18)+'</span>' : '')
+            + (b.prompt_ia ? '<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(139,92,246,0.1);color:#a78bfa">🤖 Prompt IA</span>' : '')
+            + ((b.pdfs&&b.pdfs.length) ? '<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(59,130,246,0.1);color:#60a5fa">📄 '+b.pdfs.length+' PDF</span>' : '')
+            + '</div>'
+            + (coresHtml ? '<div style="display:flex;align-items:center;gap:2px;margin-bottom:12px"><span style="font-size:10px;color:var(--text3);margin-right:4px">Cores:</span>'+coresHtml+'</div>' : '')
+            + '<button class="btn btn-primary btn-sm" style="width:100%" onclick="event.stopPropagation();openClientBriefingById(this.closest(&quot;[data-id]&quot;).dataset.id)">✏️ Editar Briefing</button>'
+            + '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><p>Erro ao carregar briefings</p></div>';
+    console.error(e);
+  }
+}
+
+function openClientBriefing(el){
+  var id = el.getAttribute('data-id');
+  if(id) openClientBriefingById(id);
+}
+
+async function openClientBriefingById(clientId){
+  await openClientDetail(clientId);
+  setTimeout(function(){
+    var tabs = document.querySelectorAll('.ti');
+    tabs.forEach(function(t){
+      if(t.getAttribute('onclick') && t.getAttribute('onclick').indexOf('cd-briefing') !== -1){
+        t.click();
+      }
+    });
+  }, 500);
+}
+
+// ================================================================
+
 // BRIEFING DO CLIENTE
 // ================================================================
 
@@ -3048,14 +3169,36 @@ function renderBriefingTab(c){
     + '<textarea class="fta" id="bf-visual-obs" rows="2" placeholder="Estilo visual, o que evitar, referências...">' + (b.visual_obs||'') + '</textarea></div>'
     + '</div>';
 
-  // Section 2: Prompt IA
+  // Section 2: Biblioteca de Prompts
+  var prompts = b.prompts || [];
+  var promptsHtml = '';
+  var CATEGORIAS = ['Educativo','Promocional','Engajamento','Bastidores','Institucional','Sazonal','Outro'];
+  var FORMATOS = ['Reels','Carrossel','Post Feed','Stories','Todos'];
+  if(!prompts.length){
+    promptsHtml = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Nenhum prompt criado. Clique em "+ Novo Prompt" para começar.</div>';
+  } else {
+    prompts.forEach(function(p, i){
+      var catColor = {'Educativo':'#60a5fa','Promocional':'#f59e0b','Engajamento':'#4ade80','Bastidores':'#a78bfa','Institucional':'#14b8a6','Sazonal':'#f472b6','Outro':'#94a3b8'}[p.categoria]||'#94a3b8';
+      promptsHtml += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+        + '<div style="font-size:13px;font-weight:700;flex:1">'+p.nome+'</div>'
+        + '<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700;background:'+catColor+'22;color:'+catColor+'">'+p.categoria+'</span>'
+        + '<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;background:var(--bg4);color:var(--text2)">'+p.formato+'</span>'
+        + '<button onclick="briefingEditPrompt(\"'+cid+'\",'+i+')" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px;padding:2px 6px" title="Editar">✏️</button>'
+        + '<button onclick="briefingDeletePrompt(\"'+cid+'\",'+i+')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:2px 6px" title="Excluir">×</button>'
+        + '</div>'
+        + '<div style="font-size:12px;color:var(--text2);line-height:1.6;white-space:pre-wrap;max-height:80px;overflow:hidden;position:relative" id="prompt-preview-'+i+'">'+p.texto+'</div>'
+        + (p.texto&&p.texto.length>200?'<button onclick="briefingExpandPrompt('+i+')" style="background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;margin-top:4px">Ver mais ↓</button>':'')
+        + '</div>';
+    });
+  }
   html += '<div id="brief-sec-2" class="brief-sec" style="display:none">'
-    + '<div style="background:rgba(212,168,85,0.06);border:1px solid rgba(212,168,85,0.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">'
-    + '💡 Este prompt será incluído na geração de Linha Editorial quando você marcar <strong style="color:var(--gold)">"Usar Briefing"</strong>.</div>'
-    + '<div class="fg"><label class="fl">Prompt personalizado para a IA</label>'
-    + '<textarea class="fta" id="bf-prompt-ia" rows="8" placeholder="Ex: Este cliente é um advogado trabalhista. Nunca use linguagem técnica. Sempre inclua CTA para WhatsApp. Priorize Reels educativos. Use emojis ⚖️ e 📄...">' + (b.prompt_ia||'') + '</textarea></div>'
-    + '<div class="fg"><label class="fl">Restrições / assuntos proibidos</label>'
-    + '<textarea class="fta" id="bf-restricoes" rows="3" placeholder="Ex: Nunca mencionar concorrentes pelo nome...">' + (b.restricoes||'') + '</textarea></div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+    + '<div><div style="font-size:13px;font-weight:700">🤖 Biblioteca de Prompts</div>'
+    + '<div style="font-size:11px;color:var(--text3);margin-top:2px">Cada prompt pode ser selecionado ao gerar a Linha Editorial</div></div>'
+    + '<button class="btn btn-primary btn-sm" onclick="briefingNewPrompt(\"'+cid+'\")">+ Novo Prompt</button>'
+    + '</div>'
+    + '<div id="bf-prompts-list">'+promptsHtml+'</div>'
     + '</div>';
 
   // Section 3: Documentos
@@ -3120,17 +3263,131 @@ async function saveBriefing(clientId){
     imgs:       gv('bf-imgs'),
     videos:     gv('bf-videos'),
     visual_obs: gv('bf-visual-obs'),
-    prompt_ia:  gv('bf-prompt-ia'),
     restricoes: gv('bf-restricoes'),
     drive_links:gv('bf-drive-links'),
     notas_docs: gv('bf-notas-docs'),
-    cores:      existing.cores  || ['#c9845a','#d4a855','#0c0a0e','#ffffff','#1e1828'],
-    pdfs:       existing.pdfs   || [],
-    campanhas:  existing.campanhas || []
+    cores:      existing.cores    || ['#c9845a','#d4a855','#0c0a0e','#ffffff','#1e1828'],
+    pdfs:       existing.pdfs     || [],
+    campanhas:  existing.campanhas|| [],
+    prompts:    existing.prompts  || []
   };
   await dbUpdate('clients', clientId, {briefing: b});
   toast('Briefing salvo! ✓','ok');
 }
+
+
+// ── GERENCIAR PROMPTS DO CLIENTE ─────────────────────────────
+var _promptEditIdx = null;
+
+function briefingNewPrompt(clientId){
+  _promptEditIdx = null;
+  briefingOpenPromptModal(clientId, null);
+}
+
+function briefingEditPrompt(clientId, index){
+  _promptEditIdx = index;
+  dbGet('clients').then(function(clients){
+    var c = clients.find(function(x){return x.id===clientId;})||{};
+    var p = (c.briefing&&c.briefing.prompts&&c.briefing.prompts[index])||{};
+    briefingOpenPromptModal(clientId, p);
+  });
+}
+
+function briefingExpandPrompt(i){
+  var el = document.getElementById('prompt-preview-'+i);
+  if(el){el.style.maxHeight='none';}
+}
+
+function briefingOpenPromptModal(clientId, p){
+  var modal = document.getElementById('modal-prompt-editor');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'modal-prompt-editor';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1001;align-items:center;justify-content:center;padding:20px;overflow-y:auto';
+    modal.addEventListener('click', function(e){ if(e.target===modal) modal.style.display='none'; });
+    document.body.appendChild(modal);
+  }
+  var CATS = ['Educativo','Promocional','Engajamento','Bastidores','Institucional','Sazonal','Outro'];
+  var FMTS = ['Reels','Carrossel','Post Feed','Stories','Todos'];
+  var catOpts = CATS.map(function(c){ return '<option value="'+c+'"'+(p&&p.categoria===c?' selected':'')+'>'+c+'</option>'; }).join('');
+  var fmtOpts = FMTS.map(function(f){ return '<option value="'+f+'"'+(p&&p.formato===f?' selected':'')+'>'+f+'</option>'; }).join('');
+  modal.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:560px;margin:auto">'
+    + '<div style="padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">'
+    + '<div style="font-size:16px;font-weight:800">🤖 '+(_promptEditIdx!==null?'Editar':'Novo')+' Prompt</div>'
+    + '<button onclick="document.getElementById(\'modal-prompt-editor\').style.display=\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:22px">×</button></div>'
+    + '<div style="padding:20px;display:flex;flex-direction:column;gap:14px">'
+    + '<div class="fg"><label class="fl">Nome do prompt *</label>'
+    + '<input class="fi" id="pe-nome" value="'+(p&&p.nome||'')+'" placeholder="Ex: Posts educativos, Promoção mensal..."></div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+    + '<div class="fg"><label class="fl">Categoria</label><select class="fs" id="pe-cat">'+catOpts+'</select></div>'
+    + '<div class="fg"><label class="fl">Formato preferido</label><select class="fs" id="pe-fmt">'+fmtOpts+'</select></div>'
+    + '</div>'
+    + '<div class="fg"><label class="fl">Texto do prompt *</label>'
+    + '<textarea class="fta" id="pe-texto" rows="8" placeholder="Descreva para a IA como deve criar o conteúdo deste cliente neste formato...&#10;&#10;Ex: Crie posts educativos sobre direitos trabalhistas. Use linguagem simples. Sempre inclua um CTA para o WhatsApp. Prefira listas numeradas. Use emojis ⚖️ e 📋.">'+(p&&p.texto||'')+'</textarea></div>'
+    + '<div style="display:flex;gap:8px;justify-content:flex-end">'
+    + '<button class="btn btn-ghost" onclick="document.getElementById(\'modal-prompt-editor\').style.display=\'none\'">Cancelar</button>'
+    + '<button class="btn btn-primary" onclick="briefingSavePrompt(\"'+clientId+'\")">💾 Salvar Prompt</button>'
+    + '</div></div></div>';
+  modal.style.display = 'flex';
+  setTimeout(function(){ var el=document.getElementById('pe-nome'); if(el)el.focus(); }, 100);
+}
+
+async function briefingSavePrompt(clientId){
+  var nome   = (document.getElementById('pe-nome')||{}).value||'';
+  var texto  = (document.getElementById('pe-texto')||{}).value||'';
+  var cat    = (document.getElementById('pe-cat')||{}).value||'Outro';
+  var fmt    = (document.getElementById('pe-fmt')||{}).value||'Todos';
+  if(!nome.trim()){ toast('Dê um nome ao prompt','er'); return; }
+  if(!texto.trim()){ toast('Escreva o texto do prompt','er'); return; }
+  var clients = await dbGet('clients');
+  var c = clients.find(function(x){return x.id===clientId;})||{};
+  var b = c.briefing||{};
+  var prompts = b.prompts||[];
+  var prompt = {nome:nome.trim(), texto:texto.trim(), categoria:cat, formato:fmt};
+  if(_promptEditIdx !== null && _promptEditIdx >= 0){
+    prompts[_promptEditIdx] = prompt;
+  } else {
+    prompts.push(prompt);
+  }
+  b.prompts = prompts;
+  await dbUpdate('clients', clientId, {briefing: b});
+  document.getElementById('modal-prompt-editor').style.display = 'none';
+  toast((_promptEditIdx!==null?'Prompt atualizado':'Prompt criado')+' ✓','ok');
+  _promptEditIdx = null;
+  openClientDetail(clientId);
+  setTimeout(function(){
+    var tabs = document.querySelectorAll('.ti');
+    tabs.forEach(function(t){
+      if(t.getAttribute('onclick')&&t.getAttribute('onclick').indexOf('cd-briefing')!==-1) t.click();
+    });
+    setTimeout(function(){
+      var btn = document.querySelector('.brief-tab[onclick*="brief-sec-2"]');
+      if(btn) btn.click();
+    }, 200);
+  }, 500);
+}
+
+async function briefingDeletePrompt(clientId, index){
+  if(!confirm('Excluir este prompt?')) return;
+  var clients = await dbGet('clients');
+  var c = clients.find(function(x){return x.id===clientId;})||{};
+  var b = c.briefing||{};
+  (b.prompts||[]).splice(index, 1);
+  await dbUpdate('clients', clientId, {briefing: b});
+  toast('Prompt removido','ok');
+  openClientDetail(clientId);
+  setTimeout(function(){
+    var tabs = document.querySelectorAll('.ti');
+    tabs.forEach(function(t){
+      if(t.getAttribute('onclick')&&t.getAttribute('onclick').indexOf('cd-briefing')!==-1) t.click();
+    });
+    setTimeout(function(){
+      var btn = document.querySelector('.brief-tab[onclick*="brief-sec-2"]');
+      if(btn) btn.click();
+    }, 200);
+  }, 500);
+}
+// ─────────────────────────────────────────────────────────────
 
 async function briefingUpdateCor(clientId, index, value){
   var clients = await dbGet('clients');
@@ -3297,6 +3554,24 @@ async function callClaude(prompt){
     toast('Erro IA: '+e.message,'er');
     return null;
   }
+}
+
+
+function iaApplyPrompt(clientId, promptIdx){
+  if(promptIdx === '') return;
+  dbGet('clients').then(function(clients){
+    var c = clients.find(function(x){return x.id===clientId;})||{};
+    var p = (c.briefing&&c.briefing.prompts&&c.briefing.prompts[parseInt(promptIdx)])||null;
+    if(!p) return;
+    // Pre-fill tema with prompt name as hint
+    var tema = document.getElementById('ai-tema');
+    var tom = document.getElementById('ai-tom');
+    if(tema && !tema.value) tema.value = p.nome;
+    if(tom && p.texto && p.texto.length < 100) tom.value = p.texto;
+    toast('Prompt "'+p.nome+'" selecionado ✓','ok');
+    // Store for use in generation
+    window._iaActivePrompt = p;
+  });
 }
 
 async function gerarLegenda(nome){const tema=document.getElementById('ai-tema').value;const tom=document.getElementById('ai-tom').value;if(!tema){toast('Informe o tema','er');return;}document.getElementById('ai-loading').classList.add('show');document.getElementById('ai-result').classList.remove('show');const r=await callClaude(`Crie uma legenda para Instagram para "${nome}". Tema: "${tema}". Tom: "${tom||'profissional'}". Máximo 150 palavras, com emoji e CTA.`);document.getElementById('ai-loading').classList.remove('show');if(r&&typeof r==='string'){document.getElementById('ai-result').textContent=r;document.getElementById('ai-result').classList.add('show');}}
@@ -3726,12 +4001,12 @@ var USER_ROLES = {
   master:   {pages:['all'], canDelete:true,  canFinanceiro:true,  canConfig:true,  canResetSenha:true,  label:'Master',    funilEtapa:null, filtroKanban:null},
   gestora:  {pages:['all'], canDelete:true,  canFinanceiro:true,  canConfig:true,  canResetSenha:true,  label:'Gestora',   funilEtapa:null, filtroKanban:null},
   gerente:  {pages:['dashboard','funil-clientes','pipeline','clientes','kanban','posts-dia','trends-page','metricas','canal','email-mkt','datas-com','calendario','onboarding','relatorios'], canDelete:true, canFinanceiro:false, canConfig:false, canResetSenha:true, label:'Gerente', funilEtapa:null, filtroKanban:null},
-  sm1:      {pages:['dashboard','kanban','posts-dia','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Social Media', funilEtapa:'sm1', filtroKanban:'sm1'},
-  sm2:      {pages:['dashboard','kanban','posts-dia','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Social Media', funilEtapa:'sm2', filtroKanban:'sm2'},
-  sm3:      {pages:['dashboard','kanban','posts-dia','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Social Media', funilEtapa:'sm3', filtroKanban:'sm3'},
-  video:    {pages:['dashboard','kanban','posts-dia','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Editor de Vídeo', funilEtapa:'video', filtroKanban:'video'},
+  sm1:      {pages:['dashboard','kanban','posts-dia','briefings','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Social Media', funilEtapa:'sm1', filtroKanban:'sm1'},
+  sm2:      {pages:['dashboard','kanban','posts-dia','briefings','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Social Media', funilEtapa:'sm2', filtroKanban:'sm2'},
+  sm3:      {pages:['dashboard','kanban','posts-dia','briefings','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Social Media', funilEtapa:'sm3', filtroKanban:'sm3'},
+  video:    {pages:['dashboard','kanban','posts-dia','briefings','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Editor de Vídeo', funilEtapa:'video', filtroKanban:'video'},
   designer: {pages:['dashboard','kanban','posts-dia','funil-clientes','canal'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Designer', funilEtapa:'design', filtroKanban:'design'},
-  postagem: {pages:['dashboard','kanban','posts-dia','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Assistente', funilEtapa:'postagem', filtroKanban:'postagem'},
+  postagem: {pages:['dashboard','kanban','posts-dia','briefings','trends-page','email-mkt','datas-com','funil-clientes'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Assistente', funilEtapa:'postagem', filtroKanban:'postagem'},
   social:   {pages:['dashboard','kanban','posts-dia','trends-page','metricas','canal'], canDelete:false, canFinanceiro:false, canConfig:false, canResetSenha:false, label:'Social Media', funilEtapa:null, filtroKanban:null},
   financeiro:{pages:['dashboard','financeiro','clientes'], canDelete:false, canFinanceiro:true, canConfig:false, canResetSenha:false, label:'Financeiro', funilEtapa:null, filtroKanban:null},
 };
@@ -4789,7 +5064,7 @@ function openGerarLinhaEditorial(){
       +'<div style="margin-bottom:16px"><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);display:block;margin-bottom:6px">Tema / foco do mês (opcional)</label><input id="le-tema" class="fi" placeholder="Ex: Lançamento de produto, Dia das Mães, Black Friday..."></div>'
       +'<div style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);display:block;margin-bottom:8px">Formatos</label><div style="display:flex;flex-wrap:wrap;gap:6px"><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-fmt-reels" checked style="accent-color:var(--accent)"> 🎬 Reels</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-fmt-carrossel" checked style="accent-color:var(--accent)"> 🎠 Carrossel</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-fmt-feed" checked style="accent-color:var(--accent)"> 📸 Post Feed</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 10px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-fmt-stories" style="accent-color:var(--accent)"> 📱 Stories</label></div></div>'
       +'<div style="margin-bottom:16px"><label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);display:block;margin-bottom:8px">Dias de publicação</label><div style="display:flex;flex-wrap:wrap;gap:6px"><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 11px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-seg" checked style="accent-color:var(--accent)"> Seg</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 11px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-ter" checked style="accent-color:var(--accent)"> Ter</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 11px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-qua" checked style="accent-color:var(--accent)"> Qua</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 11px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-qui" checked style="accent-color:var(--accent)"> Qui</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 11px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-sex" checked style="accent-color:var(--accent)"> Sex</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 11px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-sab" style="accent-color:var(--accent)"> Sáb</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:6px 11px;border-radius:9px;border:1px solid var(--border2);font-size:12px;font-weight:600"><input type="checkbox" id="le-dom" style="accent-color:var(--accent)"> Dom</label></div></div>'
-      +'<div style="margin-bottom:10px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 12px;background:rgba(212,168,85,0.06);border:1px solid rgba(212,168,85,0.2);border-radius:10px"><input type="checkbox" id="le-usar-briefing" style="accent-color:var(--gold);width:16px;height:16px"><div><div style="font-size:12px;font-weight:700;color:var(--gold)">📋 Usar Briefing do cliente</div><div style="font-size:11px;color:var(--text3);margin-top:1px">Inclui estratégia, tom de voz e prompt personalizado da aba Briefing</div></div></label></div>'
+      +'<div style="margin-bottom:10px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 12px;background:rgba(212,168,85,0.06);border:1px solid rgba(212,168,85,0.2);border-radius:10px"><input type="checkbox" id="le-usar-briefing" onchange="leToggleBriefingOpts()" style="accent-color:var(--gold);width:16px;height:16px"><div><div style="font-size:12px;font-weight:700;color:var(--gold)">📋 Usar Briefing do cliente</div><div style="font-size:11px;color:var(--text3);margin-top:1px">Inclui estratégia, tom de voz e prompt personalizado</div></div></label></div>'+'<div id="le-prompt-selector" style="display:none;margin-bottom:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px"><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Prompt a usar</div><select class="fs" id="le-prompt-id" style="margin-bottom:0"><option value="">— Briefing geral (estratégia + tom de voz) —</option></select></div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px"><button onclick="gerarLinhaEditorialIA()" style="padding:11px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">✦ Gerar com IA</button><button onclick="gerarDatasManual()" style="padding:11px;border-radius:10px;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">📅 Só criar datas</button></div>'
       +'<div id="le-datas-chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>'+'<div id="le-resultado" style="margin-top:8px"></div>'
       +'</div></div>';
@@ -4812,11 +5087,40 @@ function openGerarLinhaEditorial(){
 
 function closeLEModal(){var m=document.getElementById('modal-linha-editorial');if(m)m.style.display='none';}
 
+
+function leToggleBriefingOpts(){
+  var cb = document.getElementById('le-usar-briefing');
+  var sel = document.getElementById('le-prompt-selector');
+  if(sel) sel.style.display = (cb && cb.checked) ? 'block' : 'none';
+  if(cb && cb.checked) leUpdatePrompts();
+}
+
+function leUpdatePrompts(){
+  var clientId = (document.getElementById('le-cliente')||{}).value;
+  var sel = document.getElementById('le-prompt-id');
+  if(!sel || !clientId) return;
+  dbGet('clients').then(function(clients){
+    var c = clients.find(function(x){return x.id===clientId;})||{};
+    var prompts = (c.briefing&&c.briefing.prompts)||[];
+    // Keep first option (briefing geral)
+    while(sel.options.length > 1) sel.remove(1);
+    prompts.forEach(function(p, i){
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = p.nome + ' (' + p.categoria + ' · ' + p.formato + ')';
+      sel.appendChild(opt);
+    });
+  });
+}
+
 function leUpdateFromClient(sel){
   var opt=sel.options[sel.selectedIndex];
   var posts=opt.getAttribute('data-posts');
   var qtdSel=document.getElementById('le-qtd');
   if(qtdSel&&posts)qtdSel.value=posts;
+  // Refresh prompt list for new client
+  var cb = document.getElementById('le-usar-briefing');
+  if(cb && cb.checked) leUpdatePrompts();
 }
 
 async function gerarLinhaEditorialIA(){
@@ -4842,13 +5146,24 @@ async function gerarLinhaEditorialIA(){
   var briefingCtx = '';
   if(usarBriefing && client.briefing){
     var b = client.briefing;
-    if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
-    if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
-    if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
-    if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
-    if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
-    if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
-    if(b.prompt_ia) briefingCtx += '\n\nInstruções específicas: '+b.prompt_ia;
+    var promptIdx = document.getElementById('le-prompt-id') ? document.getElementById('le-prompt-id').value : '';
+    var prompts = b.prompts||[];
+    // If a specific prompt is selected, use it
+    if(promptIdx !== '' && prompts[parseInt(promptIdx)]){
+      var selectedPrompt = prompts[parseInt(promptIdx)];
+      briefingCtx += '\n\n=== PROMPT PERSONALIZADO: '+selectedPrompt.nome+' ===\n'+selectedPrompt.texto;
+      // Also add base context
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    } else {
+      // Use general briefing context
+      if(b.estrategia) briefingCtx += '\nEstratégia: '+b.estrategia;
+      if(b.tom) briefingCtx += '\nTom de voz: '+b.tom;
+      if(b.publico) briefingCtx += '\nPúblico: '+b.publico;
+      if(b.diferenciais) briefingCtx += '\nDiferenciais: '+b.diferenciais;
+      if(b.keywords) briefingCtx += '\nPalavras-chave: '+b.keywords;
+      if(b.restricoes) briefingCtx += '\nRestrições: '+b.restricoes;
+    }
   }
   var mesPartes=mesSel.split('-');var ano=parseInt(mesPartes[0]);var mes=parseInt(mesPartes[1]);
   var mesNome=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mes-1];
